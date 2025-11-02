@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>WS Mini – Reviewer</title>
+  </head>
+  <body style="font-family: sans-serif; padding: 24px;">
+    <h2>Reviewer</h2>
+    <p>Enter items (comma-separated):</p>
+    <textarea id="items" rows="4" style="width: 420px;">latency, retry logic, error states</textarea>
+    <br />
+    <button id="send" style="margin-top: 12px;">Send</button>
+    <div style="margin-top: 16px;">Response: <span id="resp">—</span></div>
+
+    <!-- Socket.IO client -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"
+            integrity="sha384-wfJ3S2bYlJH7qNQ4qk9Nw3q3aQ8e0uxz8nZ0c2b0q3rS7bqN0fQq2jS8mVjvGx1L"
+            crossorigin="anonymous"></script>
+    <script>
+      const socket = io('http://localhost:3000');
+      const itemsEl = document.getElementById('items');
+      const sendBtn = document.getElementById('send');
+      const respEl = document.getElementById('resp');
+
+      socket.on('connect', () => console.log('client connected', socket.id));
+
+      socket.on('agent:questions', (data) => {
+        respEl.textContent = data.text;
+      });
+
+      sendBtn.onclick = () => {
+        const items = itemsEl.value.split(',').map(s => s.trim()).filter(Boolean);
+        socket.emit('followup:create', { items, createdAt: Date.now() });
+      };
+    </script>
+  </body>
+</html>

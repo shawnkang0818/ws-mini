@@ -1,0 +1,16 @@
+{
+  "name": "ws-mini",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch server.ts"
+  },
+  "dependencies": {
+    "fastify": "^4.0.0",
+    "socket.io": "^4.0.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}
