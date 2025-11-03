@@ -5,7 +5,7 @@ export type AgentQuestions = { text: string; createdAt: number; streamId?: strin
 
 export interface ClientToServerEvents {
   "followup:create": (payload: FollowUpPayload) => void;
-  "replay:since": (since?: string) => void; // will use in redis stream
+  "replay:since": (since?: number) => void; // will use in redis stream
 }
 export interface ServerToClientEvents {
   "agent:questions": (data: AgentQuestions) => void;
