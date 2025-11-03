@@ -1,3 +1,4 @@
+import type { FollowUpPayload, AgentQuestions, ServerToClientEvents, ClientToServerEvents } from '../../shared/types';
 import { useMemo, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
@@ -9,7 +10,7 @@ export default function App() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'ack'>('idle');
   const [response, setResponse] = useState<string>('—');
 
-  const socket: Socket = useMemo(() => {
+  const socket: Socket<ServerToClientEvents, ClientToServerEvents> = useMemo(() => {
     const s = io('http://localhost:3000');
     s.on('connect', () => console.log('Reviewer connected:', s.id));
     s.on('agent:questions', (data: AgentQuestions) => {
