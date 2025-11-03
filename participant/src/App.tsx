@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
-type AgentQuestions = { text: string; createdAt: number; streamId?: string };
+type AgentQuestions = { text: string; createdAt: number };
 
 export default function App() {
   const [messages, setMessages] = useState<AgentQuestions[]>([]);
+  const [connected, setConnected] = useState(false);
+
+  // Speech queue state
   const speakingRef = useRef(false);
   const queueRef = useRef<string[]>([]);
 
@@ -12,13 +15,17 @@ export default function App() {
     const s = io('http://localhost:3000', { reconnection: true });
 
     s.on('connect', () => {
-      console.log('Participant connected');
-      // replay will be added later when we integrate Redis streams:
-      // s.emit('replay:since', lastStreamIdRef.current);
+      setConnected(true);
+      // Ask server to replay anything we missed since our last timestamp
+      const lastTs = Number(localStorage.getItem('lastReceivedAt') || '0') || undefined;
+      s.emit('replay:since', lastTs);
     });
+
+    s.on('disconnect', () => setConnected(false));
 
     s.on('agent:questions', (data: AgentQuestions) => {
       setMessages((prev) => [...prev, data]);
+      localStorage.setItem('lastReceivedAt', String(data.createdAt));
       enqueueSpeech(data.text);
     });
 
